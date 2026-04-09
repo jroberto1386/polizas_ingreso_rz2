@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pólizas de Ingreso — RZ2 Sistemas</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:        #0f1117;
+    --surface:   #161b27;
+    --border:    #232a3a;
+    --border-hi: #2e3a52;
+    --accent:    #3b82f6;
+    --accent-dim:#1d4ed8;
+    --green:     #22c55e;
+    --yellow:    #eab308;
+    --red:       #ef4444;
+    --text:      #e2e8f0;
+    --muted:     #64748b;
+    --mono:      'IBM Plex Mono', monospace;
+    --sans:      'IBM Plex Sans', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 14px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── Header ── */
+  header {
+    border-bottom: 1px solid var(--border);
+    padding: 18px 32px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: var(--surface);
+  }
+  .logo-mark {
+    width: 36px; height: 36px;
+    background: var(--accent);
+    border-radius: 8px;
+    display: grid; place-items: center;
+    font-family: var(--mono);
+    font-weight: 600;
+    font-size: 13px;
+    color: #fff;
+    letter-spacing: -0.5px;
+    flex-shrink: 0;
+  }
+  .header-text h1 {
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: -0.2px;
+  }
+  .header-text p {
+    font-size: 12px;
+    color: var(--muted);
+    font-family: var(--mono);
+  }
+  .badge {
+    margin-left: auto;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent);
+    border: 1px solid var(--accent-dim);
+    padding: 3px 10px;
+    border-radius: 20px;
+    background: rgba(59,130,246,0.08);
+  }
+
+  /* ── Layout ── */
+  main {
+    flex: 1;
+    max-width: 860px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 40px 24px 60px;
+  }
+
+  /* ── Sección ── */
+  .section-label {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    margin-bottom: 12px;
+  }
+
+  /* ── Tarjetas de archivo ── */
+  .files-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+  .files-grid.single { grid-template-columns: 1fr; }
+
+  .file-card {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--surface);
+    padding: 18px 20px;
+    cursor: pointer;
+    transition: border-color .15s, background .15s;
+    position: relative;
+    overflow: hidden;
+  }
+  .file-card:hover { border-color: var(--border-hi); background: #1a2035; }
+  .file-card.required { border-left: 3px solid var(--accent); }
+  .file-card.optional { border-left: 3px solid var(--muted); }
+  .file-card.has-file  { border-color: var(--green); background: rgba(34,197,94,0.05); }
+  .file-card.has-file.optional { border-left-color: var(--green); }
+
+  .file-card input[type="file"] {
+    position: absolute; inset: 0;
+    opacity: 0; cursor: pointer; width: 100%; height: 100%;
+  }
+  .card-top {
+    display: flex; align-items: center; gap: 10px; margin-bottom: 6px;
+  }
+  .card-icon {
+    width: 28px; height: 28px;
+    border-radius: 6px;
+    display: grid; place-items: center;
+    font-size: 13px;
+    flex-shrink: 0;
+  }
+  .card-icon.blue   { background: rgba(59,130,246,0.15); color: var(--accent); }
+  .card-icon.green  { background: rgba(34,197,94,0.15);  color: var(--green); }
+  .card-icon.yellow { background: rgba(234,179,8,0.15);  color: var(--yellow); }
+  .card-icon.gray   { background: rgba(100,116,139,0.15); color: var(--muted); }
+
+  .card-title {
+    font-weight: 500;
+    font-size: 13px;
+  }
+  .card-tag {
+    margin-left: auto;
+    font-family: var(--mono);
+    font-size: 10px;
+    padding: 2px 7px;
+    border-radius: 4px;
+  }
+  .card-tag.req  { background: rgba(59,130,246,0.15); color: var(--accent); }
+  .card-tag.opt  { background: rgba(100,116,139,0.12); color: var(--muted); }
+  .card-tag.done { background: rgba(34,197,94,0.15); color: var(--green); }
+
+  .card-desc {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+  .card-filename {
+    margin-top: 8px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--green);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: none;
+  }
+  .has-file .card-filename { display: block; }
+
+  /* ── Divisor opcional ── */
+  .opt-divider {
+    display: flex; align-items: center; gap: 10px;
+    margin: 20px 0 12px;
+  }
+  .opt-divider span {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+  .opt-divider::before, .opt-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* ── Botón procesar ── */
+  .btn-procesar {
+    width: 100%;
+    padding: 14px;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-family: var(--sans);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 24px;
+    transition: background .15s, transform .1s;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .btn-procesar:hover:not(:disabled) { background: var(--accent-dim); }
+  .btn-procesar:active:not(:disabled) { transform: scale(0.99); }
+  .btn-procesar:disabled { opacity: 0.45; cursor: not-allowed; }
+
+  /* ── Panel de progreso ── */
+  #panel-progreso {
+    display: none;
+    margin-top: 28px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--surface);
+    overflow: hidden;
+  }
+  .prog-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--muted);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .prog-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--accent);
+    animation: pulse 1.2s ease-in-out infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+  .prog-dot.done  { background: var(--green);  animation: none; }
+  .prog-dot.error { background: var(--red);    animation: none; }
+
+  .prog-bar-wrap {
+    height: 3px;
+    background: var(--border);
+  }
+  .prog-bar {
+    height: 100%;
+    background: var(--accent);
+    width: 0%;
+    transition: width .4s ease;
+  }
+  .prog-bar.done  { background: var(--green); }
+  .prog-bar.error { background: var(--red); }
+
+  .prog-body { padding: 20px; }
+  #prog-mensaje {
+    font-size: 13px;
+    color: var(--text);
+    margin-bottom: 16px;
+  }
+
+  /* ── Stats ── */
+  #stats-grid {
+    display: none;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .stat-box {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 14px;
+  }
+  .stat-box .val {
+    font-family: var(--mono);
+    font-size: 20px;
+    font-weight: 600;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .stat-box .lbl { font-size: 11px; color: var(--muted); }
+  .stat-box.green .val { color: var(--green); }
+  .stat-box.red   .val { color: var(--red); }
+  .stat-box.yellow .val { color: var(--yellow); }
+  .stat-box.blue  .val { color: var(--accent); }
+
+  /* ── Botón descarga ── */
+  #btn-descarga {
+    display: none;
+    width: 100%;
+    padding: 12px;
+    background: transparent;
+    color: var(--green);
+    border: 1px solid var(--green);
+    border-radius: 8px;
+    font-family: var(--sans);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background .15s;
+    text-decoration: none;
+    text-align: center;
+  }
+  #btn-descarga:hover { background: rgba(34,197,94,0.08); }
+
+  /* ── Advertencia PPD ── */
+  #aviso-ppd {
+    display: none;
+    margin-top: 10px;
+    padding: 10px 14px;
+    background: rgba(234,179,8,0.08);
+    border: 1px solid rgba(234,179,8,0.3);
+    border-radius: 8px;
+    font-size: 12px;
+    color: var(--yellow);
+    line-height: 1.5;
+  }
+
+  /* ── Footer ── */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 14px 32px;
+    display: flex; align-items: center; justify-content: space-between;
+    background: var(--surface);
+  }
+  footer span {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-mark">RZ2</div>
+  <div class="header-text">
+    <h1>Pólizas de Ingreso</h1>
+    <p>CONTPAq · Generación automática</p>
+  </div>
+  <div class="badge">v2.0</div>
+</header>
+
+<main>
+
+  <p class="section-label">Archivos requeridos</p>
+
+  <div class="files-grid">
+
+    <div class="file-card required" id="card-banco">
+      <input type="file" id="inp-banco" accept=".csv">
+      <div class="card-top">
+        <div class="card-icon blue">⇩</div>
+        <span class="card-title">Extracto bancario</span>
+        <span class="card-tag req" id="tag-banco">requerido</span>
+      </div>
+      <p class="card-desc">Movimientos Scotiabank en formato CSV (.csv)</p>
+      <div class="card-filename" id="fn-banco"></div>
+    </div>
+
+    <div class="file-card required" id="card-facturas">
+      <input type="file" id="inp-facturas" accept=".xlsx,.xls">
+      <div class="card-top">
+        <div class="card-icon green">≡</div>
+        <span class="card-title">Facturas pendientes</span>
+        <span class="card-tag req" id="tag-facturas">requerido</span>
+      </div>
+      <p class="card-desc">Excel con hoja <code style="font-family:var(--mono);font-size:11px;color:var(--accent)">Fact_Pendientes</code> — CFDIs de ingreso vigentes</p>
+      <div class="card-filename" id="fn-facturas"></div>
+    </div>
+
+  </div>
+
+  <div class="files-grid single">
+    <div class="file-card optional" id="card-cat">
+      <input type="file" id="inp-cat" accept=".xlsx,.xls">
+      <div class="card-top">
+        <div class="card-icon yellow">◈</div>
+        <span class="card-title">Catálogo de clientes</span>
+        <span class="card-tag opt" id="tag-cat">opcional · usa base instalada</span>
+      </div>
+      <p class="card-desc">Excel con columnas: Nombre, RFC, CodigoCuenta — para matching por RFC</p>
+      <div class="card-filename" id="fn-cat"></div>
+    </div>
+  </div>
+
+  <div class="opt-divider">
+    <span>complementos de pago</span>
+  </div>
+
+  <div class="files-grid single">
+    <div class="file-card optional" id="card-rep">
+      <input type="file" id="inp-rep" accept=".xlsx,.xls">
+      <div class="card-top">
+        <div class="card-icon gray">✦</div>
+        <span class="card-title">Complementos de pago (REP)</span>
+        <span class="card-tag opt" id="tag-rep">opcional · recomendado para facturas PPD</span>
+      </div>
+      <p class="card-desc">
+        Reporte de CFDIs tipo pago emitidos en el periodo. Permite adjuntar el UUID del REP a cada póliza.<br>
+        <span style="color:var(--yellow);font-size:11px">⚠ Sin este archivo, las facturas PPD quedarán marcadas como pendientes de REP.</span>
+      </p>
+      <div class="card-filename" id="fn-rep"></div>
+    </div>
+  </div>
+
+  <button class="btn-procesar" id="btn-procesar" disabled>
+    <span>Generar pólizas</span>
+  </button>
+
+  <!-- Panel de progreso -->
+  <div id="panel-progreso">
+    <div class="prog-header">
+      <div class="prog-dot" id="prog-dot"></div>
+      <span id="prog-estado">Procesando...</span>
+    </div>
+    <div class="prog-bar-wrap">
+      <div class="prog-bar" id="prog-bar"></div>
+    </div>
+    <div class="prog-body">
+      <div id="prog-mensaje">Iniciando proceso...</div>
+
+      <div id="stats-grid">
+        <div class="stat-box green">
+          <div class="val" id="s-matches">—</div>
+          <div class="lbl">Pólizas generadas</div>
+        </div>
+        <div class="stat-box red">
+          <div class="val" id="s-sinmatch">—</div>
+          <div class="lbl">Sin match</div>
+        </div>
+        <div class="stat-box yellow">
+          <div class="val" id="s-ppd">—</div>
+          <div class="lbl">PPD sin REP</div>
+        </div>
+        <div class="stat-box blue">
+          <div class="val" id="s-tasa">—</div>
+          <div class="lbl">Tasa de match</div>
+        </div>
+      </div>
+
+      <a id="btn-descarga" href="#">⬇ Descargar Excel CONTPAq</a>
+      <div id="aviso-ppd"></div>
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  <span>RZ2 Sistemas · GBC Business Consulting</span>
+  <span>localhost:5050</span>
+</footer>
+
+<script>
+  // ── Referencias ───────────────────────────────────
+  const inputs = {
+    banco:    document.getElementById('inp-banco'),
+    facturas: document.getElementById('inp-facturas'),
+    cat:      document.getElementById('inp-cat'),
+    rep:      document.getElementById('inp-rep'),
+  };
+  const btnProcesar = document.getElementById('btn-procesar');
+  const panelProg   = document.getElementById('panel-progreso');
+  const progBar     = document.getElementById('prog-bar');
+  const progDot     = document.getElementById('prog-dot');
+  const progEstado  = document.getElementById('prog-estado');
+  const progMensaje = document.getElementById('prog-mensaje');
+  const statsGrid   = document.getElementById('stats-grid');
+  const btnDescarga = document.getElementById('btn-descarga');
+  const avisoPPD    = document.getElementById('aviso-ppd');
+
+  // ── Manejo de selección de archivos ──────────────
+  function bindFile(key) {
+    const inp  = inputs[key];
+    const card = document.getElementById(`card-${key}`);
+    const fn   = document.getElementById(`fn-${key}`);
+    const tag  = document.getElementById(`tag-${key}`);
+    const isReq = card.classList.contains('required');
+
+    inp.addEventListener('change', () => {
+      if (inp.files.length > 0) {
+        card.classList.add('has-file');
+        fn.textContent = '✓ ' + inp.files[0].name;
+        if (tag) {
+          tag.textContent = 'listo';
+          tag.className = 'card-tag done';
+        }
+      } else {
+        card.classList.remove('has-file');
+        fn.textContent = '';
+        if (tag) {
+          tag.textContent = isReq ? 'requerido' : 'opcional';
+          tag.className = `card-tag ${isReq ? 'req' : 'opt'}`;
+        }
+      }
+      validarForm();
+    });
+  }
+
+  ['banco','facturas','cat','rep'].forEach(bindFile);
+
+  function validarForm() {
+    const ok = inputs.banco.files.length > 0 && inputs.facturas.files.length > 0;
+    btnProcesar.disabled = !ok;
+  }
+
+  // ── Envío ─────────────────────────────────────────
+  btnProcesar.addEventListener('click', async () => {
+    const fd = new FormData();
+    fd.append('banco',    inputs.banco.files[0]);
+    fd.append('facturas', inputs.facturas.files[0]);
+    if (inputs.cat.files.length)  fd.append('catalogo', inputs.cat.files[0]);
+    if (inputs.rep.files.length)  fd.append('rep',          inputs.rep.files[0]);
+
+    // Reset UI
+    btnProcesar.disabled = true;
+    panelProg.style.display = 'block';
+    statsGrid.style.display = 'none';
+    btnDescarga.style.display = 'none';
+    avisoPPD.style.display = 'none';
+    progBar.className = 'prog-bar';
+    progDot.className = 'prog-dot';
+    progEstado.textContent = 'Procesando...';
+    setProgreso(5, 'Enviando archivos...');
+
+    try {
+      const res  = await fetch('/procesar', { method: 'POST', body: fd });
+      const data = await res.json();
+      if (data.error) { mostrarError(data.error); return; }
+      polling(data.job_id);
+    } catch (e) {
+      mostrarError('Error de conexión con el servidor.');
+    }
+  });
+
+  // ── Polling ───────────────────────────────────────
+  function polling(jobId) {
+    const intervalo = setInterval(async () => {
+      try {
+        const res  = await fetch(`/status/${jobId}`);
+        const job  = await res.json();
+
+        setProgreso(job.progress, job.message);
+
+        if (job.status === 'done') {
+          clearInterval(intervalo);
+          mostrarExito(job.stats, jobId);
+        } else if (job.status === 'error') {
+          clearInterval(intervalo);
+          mostrarError(job.message);
+        }
+      } catch (e) {
+        clearInterval(intervalo);
+        mostrarError('Error al consultar el estado del proceso.');
+      }
+    }, 800);
+  }
+
+  // ── Helpers UI ────────────────────────────────────
+  function setProgreso(pct, msg) {
+    progBar.style.width = pct + '%';
+    progMensaje.textContent = msg;
+  }
+
+  function mostrarExito(stats, jobId) {
+    progDot.className = 'prog-dot done';
+    progBar.className = 'prog-bar done';
+    progEstado.textContent = 'Completado';
+    progMensaje.textContent = '¡Proceso finalizado correctamente!';
+
+    document.getElementById('s-matches').textContent  = stats.n_matches;
+    document.getElementById('s-sinmatch').textContent = stats.n_sin_match;
+    document.getElementById('s-ppd').textContent      = stats.n_ppd_sin_rep ?? '—';
+    document.getElementById('s-tasa').textContent     = stats.tasa;
+    statsGrid.style.display = 'grid';
+
+    btnDescarga.href = `/descargar/${jobId}`;
+    btnDescarga.style.display = 'block';
+
+    if (stats.n_ppd_sin_rep > 0) {
+      avisoPPD.style.display = 'block';
+      avisoPPD.textContent =
+        `⚠ ${stats.n_ppd_sin_rep} póliza(s) PPD sin complemento de pago localizado. ` +
+        `Revisa la hoja "⚠️ PPD Sin REP" del Excel para gestionar los REPs faltantes.`;
+    }
+
+    btnProcesar.disabled = false;
+  }
+
+  function mostrarError(msg) {
+    progDot.className = 'prog-dot error';
+    progBar.className = 'prog-bar error';
+    progEstado.textContent = 'Error';
+    progMensaje.textContent = msg;
+    btnProcesar.disabled = false;
+  }
+</script>
+</body>
+</html>

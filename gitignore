@@ -1,0 +1,12 @@
+uploads/
+outputs/
+__pycache__/
+*.pyc
+*.pyo
+.env
+*.xls
+*.xlsx
+*.csv
+
+# Excepción: catálogo base SÍ sube al repo
+!Cat_Clientes_RZ2.xlsx
